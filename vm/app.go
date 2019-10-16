@@ -191,7 +191,17 @@ func (app *APP) Run(action, args string) (uint64, error) {
 	}
 
 	if action == "" && args == "" {
-		return app.RunF(fnIndex)
+		vmem := app.VM.VMemory()
+		actionPointer, err := vmem.SetBytes(nil)
+		if err != nil {
+			return 0, err 
+		}
+		argsPointer, err := vmem.SetBytes(nil)
+		if err != nil {
+			return 0, err
+		}
+		params := []uint64{uint64(actionPointer), uint64(argsPointer)}
+		return app.RunF(fnIndex, params...)
 	} else {
 		vmem := app.VM.VMemory()
 		actionPointer, err := vmem.SetBytes([]byte(action))
